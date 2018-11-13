@@ -1,15 +1,8 @@
 from pathlib import Path
-#from env_variables import PROXIES
 import requests
 from lxml import html
 import argparse
-#time range for retired employees
-time_period_retired = {
-    '2016' : list(range(11, 13)),
-    '2017' : list(range(1, 13)),
-    '2018' : list(range(1, 11))
 
-}
 parser = argparse.ArgumentParser()
 parser.add_argument("--proxy", action="store_true")
 parser.add_argument("--normal", action="store_true")
@@ -53,13 +46,32 @@ if get_all_links.status_code == 200:
 #create a folder for retired employees
 retired_ppl_folder = Path("./data/retired-employees/")
 retired_ppl_folder.mkdir(parents=True, exist_ok=True)
+#create a folder for carrer data
+carrer_folder = Path("./data/carrer")
+carrer_folder.mkdir(parents=True, exist_ok=True)
 
+#download datasets
 for data in retired_ppl_links:
+    file_exists = False
     link = f"{BASE_URL}{data}"
-    print(f"Iniciando o download de {link}.")
-    if args.proxy:
-        get_data = requests.get(link, proxies=PROXIES, stream=True)
-    if args.normal:
-        get_data = requests.get(link, stream=True)
-    with open(f"{retired_ppl_folder}/{data}", "wb") as f:
-        file = f.write(get_data.content)
+    dpath = Path(f"{retired_ppl_folder}/{data}")
+    if dpath.is_file():
+        while not file_exists:
+            get_info = input(f"O arquivo {data} já foi realizado o download. Deseja refazer o download? Digite S para Sim e N para Não.")
+            if get_info.upper() == "S":
+                file_exists = True
+                print(f"Iniciando o download de {link}.")
+                if args.proxy:
+                    get_data = requests.get(link, proxies=PROXIES, stream=True)
+                if args.normal:
+                    get_data = requests.get(link, stream=True)
+                if get_data.status_code == 200:
+                   with open(f"{retired_ppl_folder}/{data}", "wb") as f:
+                       file = f.write(get_data.content)
+                else:
+                    print(f"Recurso {link} não disponível.")
+            elif get_info.upper() == "N":
+                file_exists = True
+                print(f"O arquivo {link} não será realizado download.")
+            else:
+                print("Comando inválido. Digite uma opção válida.")
