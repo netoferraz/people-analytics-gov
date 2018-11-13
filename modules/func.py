@@ -9,6 +9,7 @@ def download_data(links: list, folder: str, proxy=False, auth=None):
         dpath = Path(f"{folder}/{data}")
         if dpath.is_file():
                 while not file_exists:
+                    print("\n")
                     get_info = input(f"O arquivo {data} já foi realizado o download. Deseja refazer o download? Digite S para Sim e N para Não.")
                     if get_info.upper() == "S":
                         file_exists = True
@@ -22,10 +23,10 @@ def download_data(links: list, folder: str, proxy=False, auth=None):
                             #progress bar
                             pbar(get_data, f)
                         else:
-                            print(f"Recurso {link} não disponível.")
+                            print(f"Recurso {link} não disponível.\n")
                     elif get_info.upper() == "N":
                         file_exists = True
-                        print(f"O arquivo {link} não será realizado download.")
+                        print(f"O arquivo {link} não será realizado download.\n")
                     else:
                         print("Comando inválido. Digite uma opção válida.")
         else:
