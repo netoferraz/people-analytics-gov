@@ -50,16 +50,56 @@ retired_ppl_folder.mkdir(parents=True, exist_ok=True)
 #create a folder for carrer data
 carrer_folder = Path("./data/carrer")
 carrer_folder.mkdir(parents=True, exist_ok=True)
-
+#create a folder for GSISTE data
+giste_folder = Path("./data/gsiste")
+giste_folder.mkdir(parents=True, exist_ok=True)
+#create a folder for das data
+das_folder = Path("./data/das")
+das_folder.mkdir(parents=True, exist_ok=True)
+#create a folder for abono data
+abono_folder = Path("./data/abono")
+abono_folder.mkdir(parents=True, exist_ok=True)
+#create a pdv folder
+pdv_folder = Path("./data/pdv")
+pdv_folder.mkdir(parents=True, exist_ok=True)
+#create a licenses folder
+license_folder = Path("./data/licenses")
+license_folder.mkdir(parents=True, exist_ok=True)
+#available positions data
+availpos_folder = Path("./data/availpos")
+availpos_folder.mkdir(parents=True, exist_ok=True)
 #download datasets
-#retired people
 if args.proxy:
+    #retired people
     download_data(retired_ppl_links, retired_ppl_folder, proxy=True, auth=PROXIES)
-if args.normal:
-    download_data(retired_ppl_links, retired_ppl_folder)
-
-#carrer data
-if args.proxy:
+    #carrer data.
     download_data(carrer_ppl_links, carrer_folder, proxy=True, auth=PROXIES)
+    #GSISTE data
+    download_data(temporary_grat, giste_folder, proxy=True, auth=PROXIES)
+    #DAS data
+    download_data(das_data, das_folder, proxy=True, auth=PROXIES)
+    #abono data 
+    download_data(abono_data, abono_folder, proxy=True, auth=PROXIES)
+    #pdv data
+    download_data(pdv_data, pdv_folder, proxy=True, auth=PROXIES)
+    #licenses data
+    download_data(licenses_data, license_folder, proxy=True, auth=PROXIES)
+    #available position data
+    download_data(available_position_data, availpos_folder, proxy=True, auth=PROXIES)
 if args.normal:
+    #retired people
+    download_data(retired_ppl_links, retired_ppl_folder)
+    #carrer data
     download_data(carrer_ppl_links, carrer_folder)
+    #GSISTE data
+    download_data(temporary_grat, giste_folder)
+    #DAS data
+    download_data(das_data, das_folder)
+    #abono data 
+    download_data(abono_data, abono_folder)
+    #pdv data
+    download_data(pdv_data, pdv_folder)
+    #licenses data
+    download_data(licenses_data, license_folder)
+    #available position data
+    download_data(available_position_data, availpos_folder)
