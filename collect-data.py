@@ -2,6 +2,7 @@ from pathlib import Path
 import requests
 from lxml import html
 import argparse
+from modules.func import download_data
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--proxy", action="store_true")
@@ -51,22 +52,35 @@ carrer_folder = Path("./data/carrer")
 carrer_folder.mkdir(parents=True, exist_ok=True)
 
 #download datasets
+#retired people
+if args.proxy:
+    download_data(retired_ppl_links, retired_ppl_folder, proxy=True, auth=PROXIES)
+if args.normal:
+    download_data(retired_ppl_links, retired_ppl_folder)
+
+#carrer data
+if args.proxy:
+    download_data(carrer_ppl_links, carrer_folder, proxy=True, auth=PROXIES)
+if args.normal:
+    download_data(carrer_ppl_links, carrer_folder)
+"""
 for data in retired_ppl_links:
     file_exists = False
     link = f"{BASE_URL}{data}"
+    #retired ppl
     dpath = Path(f"{retired_ppl_folder}/{data}")
     if dpath.is_file():
         while not file_exists:
             get_info = input(f"O arquivo {data} já foi realizado o download. Deseja refazer o download? Digite S para Sim e N para Não.")
             if get_info.upper() == "S":
                 file_exists = True
-                print(f"Iniciando o download de {link}.")
                 if args.proxy:
                     get_data = requests.get(link, proxies=PROXIES, stream=True)
                 if args.normal:
                     get_data = requests.get(link, stream=True)
                 if get_data.status_code == 200:
                    with open(f"{retired_ppl_folder}/{data}", "wb") as f:
+                       print(f"Iniciando o download de {link}.")
                        file = f.write(get_data.content)
                 else:
                     print(f"Recurso {link} não disponível.")
@@ -75,3 +89,15 @@ for data in retired_ppl_links:
                 print(f"O arquivo {link} não será realizado download.")
             else:
                 print("Comando inválido. Digite uma opção válida.")
+    else:
+        if args.proxy:
+            get_data = requests.get(link, proxies=PROXIES, stream=True)
+        if args.normal:
+            get_data = requests.get(link, stream=True)
+        if get_data.status_code == 200:
+            with open(f"{retired_ppl_folder}/{data}", "wb") as f:
+                print(f"Iniciando o download de {link}.")
+                file = f.write(get_data.content)
+        else:
+            print(f"Recurso {link} não disponível.")
+"""
