@@ -102,4 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+#user variables
 env_variables.py
+#datasets
+data/

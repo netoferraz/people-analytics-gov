@@ -1,8 +1,8 @@
 from pathlib import Path
-from env_variables import PROXIES
+#from env_variables import PROXIES
 import requests
 from lxml import html
-
+import argparse
 #time range for retired employees
 time_period_retired = {
     '2016' : list(range(11, 13)),
@@ -10,9 +10,17 @@ time_period_retired = {
     '2018' : list(range(1, 11))
 
 }
+parser = argparse.ArgumentParser()
+parser.add_argument("--proxy", action="store_true")
+parser.add_argument("--normal", action="store_true")
+args = parser.parse_args()
 
 BASE_URL = "http://repositorio.dados.gov.br/segrt/"
-get_all_links = requests.get(BASE_URL, proxies=PROXIES)
+if args.proxy:
+    from env_variables import PROXIES
+    get_all_links = requests.get(BASE_URL, proxies=PROXIES)
+if args.normal:
+   get_all_links = requests.get(BASE_URL)
 #download all data available for people in federal governmnet
 if get_all_links.status_code == 200:
     content = html.fromstring(get_all_links.text)
@@ -42,4 +50,16 @@ if get_all_links.status_code == 200:
     #example of url http://repositorio.dados.gov.br/segrt/LotOrgao_DistOcupVagas%20-%20201803.xlsx
     available_position_data = [link for link in filter_only_a_tags if 'DISTOCUP' in link.upper() and 'PDF' not in link.upper()]
 
+#create a folder for retired employees
+retired_ppl_folder = Path("./data/retired-employees/")
+retired_ppl_folder.mkdir(parents=True, exist_ok=True)
 
+for data in retired_ppl_links:
+    link = f"{BASE_URL}{data}"
+    print(f"Iniciando o download de {link}.")
+    if args.proxy:
+        get_data = requests.get(link, proxies=PROXIES, stream=True)
+    if args.normal:
+        get_data = requests.get(link, stream=True)
+    with open(f"{retired_ppl_folder}/{data}", "wb") as f:
+        file = f.write(get_data.content)
