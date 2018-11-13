@@ -1,5 +1,6 @@
 from pathlib import Path
 import requests
+import progressbar
 def download_data(links: list, folder: str, proxy=False, auth=None):
     BASE_URL = "http://repositorio.dados.gov.br/segrt/"
     for data in links:
@@ -16,9 +17,10 @@ def download_data(links: list, folder: str, proxy=False, auth=None):
                         if not proxy:
                             get_data = requests.get(link, stream=True)
                         if get_data.status_code == 200:
-                            with open(dpath, "wb") as f:
-                                print(f"Iniciando o download de {link}.")
-                                _ = f.write(get_data.content)
+                            f = open(dpath, 'wb')
+                            print(f"Iniciando o download de {link}.")
+                            #progress bar
+                            pbar(get_data, f)
                         else:
                             print(f"Recurso {link} não disponível.")
                     elif get_info.upper() == "N":
@@ -32,8 +34,22 @@ def download_data(links: list, folder: str, proxy=False, auth=None):
             if not proxy:
                 get_data = requests.get(link, stream=True)
             if get_data.status_code == 200:
-                with open(dpath, "wb") as f:
-                    print(f"Iniciando o download de {link}.")
-                    _ = f.write(get_data.content)
+                #with open(dpath, "wb") as f:
+                f = open(dpath, 'wb')
+                print(f"Iniciando o download de {link}.")
+                #progress bar
+                pbar(get_data, f)
             else:
                 print(f"Recurso {link} não disponível.")
+
+def pbar(req, fname):
+    file_size = int(req.headers['Content-Length'])
+    chunk = 1
+    num_bars = file_size / chunk
+    bar =  progressbar.ProgressBar(maxval=num_bars).start()
+    i = 0
+    for chunk in req.iter_content():
+        fname.write(chunk)
+        bar.update(i)
+        i+=1
+    fname.close()
