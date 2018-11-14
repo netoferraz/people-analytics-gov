@@ -1,6 +1,6 @@
 from pathlib import Path
 import requests
-import progressbar
+from clint.textui import progress
 def download_data(links: list, folder: str, proxy=False, auth=None):
     BASE_URL = "http://repositorio.dados.gov.br/segrt/"
     for data in links:
@@ -18,10 +18,8 @@ def download_data(links: list, folder: str, proxy=False, auth=None):
                         if not proxy:
                             get_data = requests.get(link, stream=True)
                         if get_data.status_code == 200:
-                            f = open(dpath, 'wb')
                             print(f"Iniciando o download de {link}.")
-                            #progress bar
-                            pbar(get_data, f)
+                            pbar(get_data, dpath)
                         else:
                             print(f"Recurso {link} não disponível.\n")
                     elif get_info.upper() == "N":
@@ -35,22 +33,15 @@ def download_data(links: list, folder: str, proxy=False, auth=None):
             if not proxy:
                 get_data = requests.get(link, stream=True)
             if get_data.status_code == 200:
-                #with open(dpath, "wb") as f:
-                f = open(dpath, 'wb')
                 print(f"Iniciando o download de {link}.")
-                #progress bar
-                pbar(get_data, f)
+                pbar(get_data, dpath)
             else:
                 print(f"Recurso {link} não disponível.")
 
-def pbar(req, fname):
-    file_size = int(req.headers['Content-Length'])
-    chunk = 1
-    num_bars = file_size / chunk
-    bar =  progressbar.ProgressBar(maxval=num_bars).start()
-    i = 0
-    for chunk in req.iter_content():
-        fname.write(chunk)
-        bar.update(i)
-        i+=1
-    fname.close()
+def pbar(r, path):
+    with open(path, "wb") as f:
+        total_length = int(r.headers.get('content-length'))
+        for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
+            if chunk:
+                f.write(chunk)
+                f.flush()
