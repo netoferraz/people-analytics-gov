@@ -2,7 +2,7 @@ from pathlib import Path
 import requests
 from lxml import html
 import argparse
-from modules.func import download_data
+from modules.func import download_data, create_folder
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--proxy", action="store_true")
@@ -44,62 +44,33 @@ if get_all_links.status_code == 200:
     #example of url http://repositorio.dados.gov.br/segrt/LotOrgao_DistOcupVagas%20-%20201803.xlsx
     available_position_data = [link for link in filter_only_a_tags if 'DISTOCUP' in link.upper() and 'PDF' not in link.upper()]
 
+
 #create a folder for retired employees
-retired_ppl_folder = Path("./data/retired-employees/")
-retired_ppl_folder.mkdir(parents=True, exist_ok=True)
+retired_ppl_folder = create_folder("retired-employees")
 #create a folder for carrer data
-carrer_folder = Path("./data/carrer")
-carrer_folder.mkdir(parents=True, exist_ok=True)
+carrer_folder = create_folder("carrer")
 #create a folder for GSISTE data
-giste_folder = Path("./data/gsiste")
-giste_folder.mkdir(parents=True, exist_ok=True)
+giste_folder = create_folder("gsiste")
 #create a folder for das data
-das_folder = Path("./data/das")
-das_folder.mkdir(parents=True, exist_ok=True)
+das_folder = create_folder("das")
 #create a folder for abono data
-abono_folder = Path("./data/abono")
-abono_folder.mkdir(parents=True, exist_ok=True)
+abono_folder = create_folder("abono")
 #create a pdv folder
-pdv_folder = Path("./data/pdv")
-pdv_folder.mkdir(parents=True, exist_ok=True)
+pdv_folder = create_folder("pdv")
 #create a licenses folder
-license_folder = Path("./data/licenses")
-license_folder.mkdir(parents=True, exist_ok=True)
+license_folder = create_folder("licenses")
 #available positions data
-availpos_folder = Path("./data/availpos")
-availpos_folder.mkdir(parents=True, exist_ok=True)
+availpos_folder = create_folder("availpos")
+
+#list of all links
+list_of_links = [retired_ppl_links, carrer_ppl_links, temporary_grat, das_data, abono_data, pdv_data, licenses_data, available_position_data]
+#list of all folders
+list_of_folders = [retired_ppl_folder, carrer_folder, giste_folder, das_folder, abono_folder, pdv_folder, license_folder, availpos_folder]
+
 #download datasets
 if args.proxy:
-    #retired people
-    download_data(retired_ppl_links, retired_ppl_folder, proxy=True, auth=PROXIES)
-    #carrer data.
-    download_data(carrer_ppl_links, carrer_folder, proxy=True, auth=PROXIES)
-    #GSISTE data
-    download_data(temporary_grat, giste_folder, proxy=True, auth=PROXIES)
-    #DAS data
-    download_data(das_data, das_folder, proxy=True, auth=PROXIES)
-    #abono data 
-    download_data(abono_data, abono_folder, proxy=True, auth=PROXIES)
-    #pdv data
-    download_data(pdv_data, pdv_folder, proxy=True, auth=PROXIES)
-    #licenses data
-    download_data(licenses_data, license_folder, proxy=True, auth=PROXIES)
-    #available position data
-    download_data(available_position_data, availpos_folder, proxy=True, auth=PROXIES)
+    for links, folder in zip(list_of_links, list_of_folders):
+        download_data(links, folder)
 if args.normal:
-    #retired people
-    download_data(retired_ppl_links, retired_ppl_folder)
-    #carrer data
-    download_data(carrer_ppl_links, carrer_folder)
-    #GSISTE data
-    download_data(temporary_grat, giste_folder)
-    #DAS data
-    download_data(das_data, das_folder)
-    #abono data 
-    download_data(abono_data, abono_folder)
-    #pdv data
-    download_data(pdv_data, pdv_folder)
-    #licenses data
-    download_data(licenses_data, license_folder)
-    #available position data
-    download_data(available_position_data, availpos_folder)
+    for links, folder in zip(list_of_links, list_of_folders):
+        download_data(links, folder)

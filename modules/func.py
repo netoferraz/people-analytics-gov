@@ -1,6 +1,7 @@
 from pathlib import Path
 import requests
 from clint.textui import progress
+
 def download_data(links: list, folder: str, proxy=False, auth=None):
     BASE_URL = "http://repositorio.dados.gov.br/segrt/"
     for data in links:
@@ -45,3 +46,8 @@ def pbar(r, path):
             if chunk:
                 f.write(chunk)
                 f.flush()
+
+def create_folder(name):
+    foldername = Path(f"./data/{name}/")
+    foldername.mkdir(parents=True, exist_ok=True)
+    return foldername
